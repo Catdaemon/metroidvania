@@ -9,6 +9,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
   <ItemGroup>
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
@@ -26,9 +29,11 @@
   <ItemGroup>
     <PackageReference Include="Aether.Physics2D.Diagnostics.MG" Version="1.5.0" />
     <PackageReference Include="Aether.Physics2D.MG" Version="1.5.0" />
+    <PackageReference Include="ImpromptuNinjas.UltralightSharp" Version="1.2.0-beta-r11" />
     <PackageReference Include="MonoGame.Extended" Version="3.8.0" />
     <PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="3.8.0" />
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
+    <PackageReference Include="MonoGame.Penumbra.DesktopGL" Version="2.0.0" />
   </ItemGroup>
 </Project>

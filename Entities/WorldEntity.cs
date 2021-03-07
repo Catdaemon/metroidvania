@@ -7,6 +7,8 @@ using MonoGame.Extended;
 using tainicom.Aether.Physics2D.Dynamics;
 using tainicom.Aether.Physics2D.Common;
 using System.Collections.Generic;
+using Penumbra;
+using System.Linq;
 
 class WorldEntity : IGameEntity
 {
@@ -16,6 +18,7 @@ class WorldEntity : IGameEntity
     private TiledMapRenderer _mapRenderer;
 
     private List<Body> tileBodies = new List<Body>();
+    private List<Hull> tileHulls = new List<Hull>();
 
     public WorldEntity(ContentManager contentManager, GraphicsDevice graphicsDevice, string mapName) {
         _map = contentManager.Load<TiledMap>("maps/" + mapName);
@@ -46,26 +49,63 @@ class WorldEntity : IGameEntity
                         tileBodies.Add(shape);
                     }
                 }
+            } else if (objectLayer.Name == "shadows") {
+                foreach(var obj in objectLayer.Objects)
+                {
+                    var polys = obj as TiledMapPolygonObject;
+                    if (polys != null) {
+                        var pointsAsVectors = new List<Vector2>();
+                        foreach (var point in polys.Points)
+                        {
+                            pointsAsVectors.Add(point);
+                        }
+
+                        var shadowHull = new Hull(pointsAsVectors) {
+                            Position = obj.Position
+                        };
+                        LightingController.AddHull(shadowHull);
+                        this.tileHulls.Add(shadowHull);
+                    }
+                }
             } else {
                 foreach(var obj in objectLayer.Objects)
                 {
                     var tileObject = obj as TiledMapObject;
                     if (tileObject == null) continue;
                     
-                    var created = EntityManager.Create(tileObject.Type, tileObject.Position);
+                    var created = EntityManager.Create(tileObject.Type, tileObject.Position, tileObject.Properties);
                 }
             }
         }
     }
 
-    public void Update(double delta) {}
-    public void Draw(double delta, SpriteBatch spriteBatch) {}
+    public void Update(float delta) {}
+    public void Draw(float delta, SpriteBatch spriteBatch) {}
 
     public void DrawWorld(GameTime gameTime, OrthographicCamera camera) {
-        _mapRenderer.Draw(camera.GetViewMatrix());
+        foreach (var layer in _map.TileLayers)
+        {
+            if (layer.Name == "foreground") continue;
+            _mapRenderer.Draw(layer, camera.GetViewMatrix(), null, null, 0f);
+        }
+    }
+
+    public void DrawForeground(GameTime gameTime, OrthographicCamera camera) {
+        
+        foreach (var layer in _map.TileLayers)
+        {
+            
+            if (layer.Name != "foreground") continue;
+            _mapRenderer.Draw(layer, camera.GetViewMatrix(), null, null, 0f);
+        }
     }
 
     public void UpdateWorld(GameTime gameTime) {
         _mapRenderer.Update(gameTime);
+    }
+
+    public void Remove() {
+        this.tileHulls.ForEach(x => LightingController.RemoveHull(x));
+        this.tileBodies.ForEach(x => PhysicsController.World.Remove(x));
     }
 }

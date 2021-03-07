@@ -5,6 +5,7 @@ using tainicom.Aether.Physics2D.Dynamics.Contacts;
 using tainicom.Aether.Physics2D.Collision;
 using MonoGame.Extended;
 using System;
+using System.Collections.Generic;
 
 public class Rat : PhysicsEntity
 {
@@ -13,6 +14,8 @@ public class Rat : PhysicsEntity
 
     private DateTime nextAttack;
     private int attackRate = 3;
+
+    public Penumbra.Hull lightingHull;
 
     public Rat() {
         this.Size = new Size2(12, 12);
@@ -27,10 +30,23 @@ public class Rat : PhysicsEntity
 
         Body.SetRestitution(0f);
         Body.FixedRotation = true;
+
+        var _points = new List<Vector2>()
+        {
+            new Vector2(-this.Size.Width / 2,-this.Size.Height / 2),
+            new Vector2(this.Size.Width / 2,-this.Size.Height / 2),
+            new Vector2(this.Size.Width / 2,this.Size.Height / 2),
+            new Vector2(-this.Size.Width / 2,this.Size.Height / 2),
+        };
+        lightingHull = new Penumbra.Hull(_points);
+
+        LightingController.AddHull(lightingHull);
     }
 
-    public override void Update(double delta) {
+    public override void Update(float delta) {
         var closest = EntityManager.GetClosestPlayer(this.Position);
+
+        lightingHull.Position = this.Position;
 
         if (closest != null)
         {
@@ -59,9 +75,17 @@ public class Rat : PhysicsEntity
 
             this.Body.LinearVelocity = new Vector2(moveAmount, this.Body.LinearVelocity.Y);
         }
+
+        
     }
 
-    public override void Draw(double delta, SpriteBatch batch) {
+    public override void Draw(float delta, SpriteBatch batch) {
         batch.DrawRectangle(this.Position - new Vector2(Size.Width / 2, Size.Height / 2), Size, Color.Red, 1, 0);
+    }
+
+    public override void Remove()
+    {
+        LightingController.RemoveHull(lightingHull);
+        base.Remove();
     }
 }

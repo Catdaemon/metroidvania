@@ -7,7 +7,7 @@ public interface IGameEntity
     public Vector2 Position { get; set; }
     public Size2 Size { get; set; }
 
-    public void Draw(double delta, SpriteBatch batch);
-    public void Update(double delta);
-    public void OnDestroyed() {}
+    public void Draw(float delta, SpriteBatch batch);
+    public void Update(float delta);
+    public void Remove();
 }

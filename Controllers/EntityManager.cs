@@ -3,12 +3,12 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using MonoGame.Extended.Tiled;
 public static class EntityManager
 {
     public static List<IGameEntity> AllEntities = new List<IGameEntity>();
 
-    public static IGameEntity Create(string TypeName, Vector2 Position)
+    public static IGameEntity Create(string TypeName, Vector2 Position, TiledMapProperties Props)
     {
         IGameEntity created = null;
 
@@ -22,6 +22,26 @@ public static class EntityManager
                 break;
             case "bat":
                 // do nothing
+                break;
+            case "light":
+                var color = Props.Where(x => x.Key == "color").FirstOrDefault().Value;
+                var radius = Props.Where(x => x.Key == "radius").FirstOrDefault().Value;
+                
+                var _color = new Color(0,0,0);
+                if (!String.IsNullOrEmpty(color))
+                {
+                    var fromhex = System.Drawing.ColorTranslator.FromHtml(color);
+                    _color = new Color(fromhex.R, fromhex.G, fromhex.B);
+                }
+
+                var _radius = 3000f;
+                if (!String.IsNullOrEmpty(radius))
+                {
+                    float.TryParse(radius, System.Globalization.NumberStyles.Any, null, out _radius);
+                }
+
+                created = new WorldLight(Position, _radius, _color);
+                
                 break;
             default:
                 throw new NotImplementedException();

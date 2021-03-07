@@ -24,10 +24,11 @@ public class PhysicsEntity : IGameEntity
         return downRay.Hit;
     }
 
-    public virtual void OnDestroyed() {
-        PhysicsController.World.Remove(Body);
-    }
+    public virtual void Update(float delta) {}
+    public virtual void Draw(float delta, SpriteBatch batch) {}
 
-    public virtual void Update(double delta) {}
-    public virtual void Draw(double delta, SpriteBatch batch) {}
+    public virtual void Remove() {
+        PhysicsController.World.Remove(Body);
+        EntityManager.Remove(this);
+    }
 }
