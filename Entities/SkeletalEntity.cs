@@ -3,16 +3,16 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using Spine;
 
-
+using tainicom.Aether.Physics2D;
 public interface ISkeletalEntity : IGameEntity
 {
     Skeleton Skeleton { get; set; }
     AnimationState AnimationState { get; set; }
     string CurrentAnimation { get; set; }
 
-    public Vector2 SkeletonPosition { 
+    public Vector2 SkeletonPosition {
         get {
-            return this.Position + new Vector2(0, this.Size.Height / 2);
+            return this.Position + new Vector2(0, this.Size.Height / 2f + 2f);
         }
     }
 
@@ -21,8 +21,8 @@ public interface ISkeletalEntity : IGameEntity
         var atlas = SkeletonController.GetAtlas(atlasPath);
         Skeleton = SkeletonController.GetSkeleton(SkeletonPath, atlas);
 
-        Skeleton.ScaleX = 0.05f;
-        Skeleton.ScaleY = 0.05f;
+        Skeleton.ScaleX = 0.04f;
+        Skeleton.ScaleY = 0.04f;
 
         AnimationStateData stateData = new AnimationStateData(Skeleton.Data);
         stateData.DefaultMix = 0.2f;
@@ -36,7 +36,6 @@ public interface ISkeletalEntity : IGameEntity
 
         AnimationState.Update(delta);
         AnimationState.Apply(Skeleton);
-        
     }
 
     void DrawSkeleton(float delta)

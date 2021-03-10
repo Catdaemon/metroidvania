@@ -14,11 +14,70 @@ public static class InputController
     private static Vector2 _lastMousePos = new Vector2(0,0);
     private static Vector2 _lastStickAng = new Vector2(0,0);
     private static InputType _lastInput = InputType.KBM;
+    private static MouseState LastMouseState;
+
+    private static bool LastEscState = false;
 
     public static void Setup(OrthographicCamera camera)
     {
         _camera = camera;
+        LastMouseState = Mouse.GetState();        
     }
+
+    public static bool LeftClickPressed {
+        get {
+            var state = Mouse.GetState();
+            if (state.LeftButton == ButtonState.Pressed && LastMouseState.LeftButton != ButtonState.Pressed)
+            {
+                LastMouseState = state;
+                return true;
+            }
+            
+            return false;
+        }
+    }
+    public static bool LeftClickReleased {
+        get {
+            var state = Mouse.GetState();
+
+            if (state.LeftButton == ButtonState.Released && LastMouseState.LeftButton != ButtonState.Released)
+            {
+                LastMouseState = state;
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public static bool PausePressed {
+        get {
+            var kb = Keyboard.GetState();
+
+            if (kb.IsKeyDown(Keys.Escape) && LastEscState == false)
+            {
+                LastEscState = true;
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public static bool PauseReleased {
+        get {
+            var kb = Keyboard.GetState();
+
+            if (kb.IsKeyUp(Keys.Escape) && LastEscState == true)
+            {
+                LastEscState = false;
+                return true;
+            }
+
+            return false;
+        }
+    }
+
 
     public static float X {
         get {

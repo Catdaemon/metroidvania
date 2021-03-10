@@ -26,11 +26,11 @@ public class Player : PhysicsEntity, ISkeletalEntity
     Light Flashlight;
     
     public Player() {
-        this.Size = new Size2(8, 24);
-        Body = PhysicsController.World.CreateCapsule(Size.Height, Size.Width, 4, Size.Width, 4, 1, bodyType: BodyType.Dynamic);
+        this.Size = new Size2(8, 22);
+        Body = PhysicsController.World.CreateRectangle(ConvertUnits.ToSimUnits(Size.Width), ConvertUnits.ToSimUnits(Size.Height), 10, bodyType: BodyType.Dynamic);
         Body.Tag = this;
 
-        Body.Mass = 5;
+        Body.Mass = 120;
         Body.SetRestitution(0f);
         Body.FixedRotation = true;
         Body.OnCollision += onCollision;
@@ -56,25 +56,25 @@ public class Player : PhysicsEntity, ISkeletalEntity
         this.grounded = this.IsGrounded();
         AimAngle = InputController.GetAimNormal(this.Position);
 
-        var airResist = 2f;
+        var airResist = 5f;
         var groundResist = 10f;
 
         if (grounded) {
-            Body.LinearVelocity = new Vector2(MathHelper.Lerp(Body.LinearVelocity.X, 0,groundResist *delta), 0);
+            Body.LinearVelocity = new Vector2(MathHelper.Lerp(Body.LinearVelocity.X, 0, groundResist * delta), 0);
 
             Body.LinearVelocity = new Vector2(Body.LinearVelocity.X, 0);
             if (InputController.Jump) {
-                Body.LinearVelocity = new Vector2(Body.LinearVelocity.X, -100f);
+                Body.LinearVelocity = new Vector2(Body.LinearVelocity.X, -1f);
             }
 
-            float moveSpeed = (1000f * InputController.X * delta);
+            float moveSpeed = (10f * InputController.X * delta);
             if (Body.LinearVelocity.X < maxSpeed) {
                 Body.LinearVelocity = new Vector2(Body.LinearVelocity.X + moveSpeed, Body.LinearVelocity.Y);
             }
         } else {
             Body.LinearVelocity = new Vector2(MathHelper.Lerp(Body.LinearVelocity.X, 0, airResist *delta), Body.LinearVelocity.Y);
 
-            float moveSpeed = (500f * InputController.X * delta);
+            float moveSpeed = (5f * InputController.X * delta);
             if (Body.LinearVelocity.X < maxSpeed) {
                 Body.LinearVelocity = new Vector2(Body.LinearVelocity.X + moveSpeed, Body.LinearVelocity.Y);
             }
@@ -95,8 +95,8 @@ public class Player : PhysicsEntity, ISkeletalEntity
         //     Body.LinearVelocity = new Vector2(0, Body.LinearVelocity.Y);
         // }
 
-        var movement = this.Body.LinearVelocity * delta;
-        var newPos = this.Position + movement;
+        //var movement = this.Body.LinearVelocity * delta;
+        //var newPos = this.Position + movement;
 
         isAimingForward = AimAngle.X > 0;
         
@@ -121,6 +121,7 @@ public class Player : PhysicsEntity, ISkeletalEntity
         var _shootPos = new Vector2(ShootPos.worldX, ShootPos.worldY);
 
         batch.DrawLine(_shootPos, _shootPos + (AimAngle * 32), Color.Red, 1);
+        batch.DrawRectangle(this.Position - new Vector2(this.Size.Width / 2, this.Size.Height / 2), this.Size, Color.Red, 1, 0);
 
         //batch.End();
 

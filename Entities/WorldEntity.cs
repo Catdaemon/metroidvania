@@ -24,7 +24,7 @@ class WorldEntity : IGameEntity
         _map = contentManager.Load<TiledMap>("maps/" + mapName);
         _mapRenderer = new TiledMapRenderer(graphicsDevice, _map);
 
-        PhysicsController.World.Gravity = new Vector2(0, 200f);
+        PhysicsController.World.Gravity = new Vector2(0, 2f);
 
         foreach(var objectLayer in _map.ObjectLayers)
         {
@@ -37,10 +37,10 @@ class WorldEntity : IGameEntity
                         var _Vertices = new Vertices();
                         foreach (var point in polys.Points)
                         {
-                            _Vertices.Add(new Vector2(point.X, point.Y));
+                            _Vertices.Add(ConvertUnits.ToSimUnits(new Vector2(point.X, point.Y)));
                         }
 
-                        var shape = PhysicsController.World.CreatePolygon(_Vertices, 1, obj.Position, 0, BodyType.Static);
+                        var shape = PhysicsController.World.CreatePolygon(_Vertices, 1, ConvertUnits.ToSimUnits(obj.Position), 0, BodyType.Static);
 
                         shape.Tag = this;
 

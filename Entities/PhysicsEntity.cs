@@ -10,10 +10,10 @@ public class PhysicsEntity : IGameEntity
 
     public Vector2 Position {
         get {
-            return Body.WorldCenter;
+            return ConvertUnits.ToDisplayUnits(Body.WorldCenter);
         }
         set {
-            Body.Position = value;
+            Body.Position = ConvertUnits.ToSimUnits(value);
         }
     }
 

@@ -10,7 +10,7 @@ public class Ball : PhysicsEntity
     public Penumbra.Hull lightingHull;
     public Ball() {
         this.Size = new Size2(8,8);
-        Body = PhysicsController.World.CreateCircle(this.Size.Width / 2, 10f, new Vector2(0,0), BodyType.Dynamic);
+        Body = PhysicsController.World.CreateCircle(ConvertUnits.ToSimUnits(this.Size.Width / 2), ConvertUnits.ToSimUnits(16f), new Vector2(0,0), BodyType.Dynamic);
         Body.SetRestitution(0f);
         Body.Tag = this;
 

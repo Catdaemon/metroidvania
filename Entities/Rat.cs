@@ -19,7 +19,7 @@ public class Rat : PhysicsEntity
 
     public Rat() {
         this.Size = new Size2(12, 12);
-        Body = PhysicsController.World.CreateCircle(Size.Width / 2, 5, bodyType: BodyType.Dynamic);
+        Body = PhysicsController.World.CreateCircle(ConvertUnits.ToSimUnits(Size.Width / 2), 5, bodyType: BodyType.Dynamic);
         Body.Tag = this;
 
         var rand = new Random();
@@ -55,13 +55,13 @@ public class Rat : PhysicsEntity
             if (distance < 64 && nextAttack < DateTime.Now)
             {
                 var movement = (closest.Position - this.Position).NormalizedCopy();
-                this.Body.LinearVelocity = new Vector2(movement.X * 120, -200);
+                this.Body.LinearVelocity = new Vector2(movement.X * 3, -1);
                 nextAttack = DateTime.Now.AddSeconds(attackRate);
                 return;
             } else if (distance < 96)
             {
                 var movement = (closest.Position - this.Position).NormalizedCopy();
-                this.Body.LinearVelocity = new Vector2(movement.X * 80, this.Body.LinearVelocity.Y);
+                this.Body.LinearVelocity = new Vector2(movement.X * 1f, this.Body.LinearVelocity.Y);
                 return;
             }
         }
@@ -70,7 +70,7 @@ public class Rat : PhysicsEntity
         if (DateTime.Now > nextRandomMovement)
         {
             var rand = new Random();
-            var moveAmount = rand.Next(-300, 300);
+            var moveAmount = rand.Next(-30, 30) / 10;
             nextRandomMovement = DateTime.Now.AddSeconds(moveFrequency);
 
             this.Body.LinearVelocity = new Vector2(moveAmount, this.Body.LinearVelocity.Y);

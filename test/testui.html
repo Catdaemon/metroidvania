@@ -1,285 +1,310 @@
 <html>
-    <head>
-        <style>
-            body {
-                width: 100vw;
-                height: 100vh;
-                overflow: hidden;
-                margin:0;
-            }
-            #top {
-                width: 98vw;
-                height: 5vh;
-                padding:1vw;
-                display: flex;
-                flex-direction: row;
-                align-items: flex-start;
-                justify-content: space-between;
-            }
-            #top > div {
-                display:flex;
-            }
-            #status {
-                position: relative;
-                display:flex;
-                width:25%;
-            }
-            #status img {
-                border-radius: 50%;
-                width:10vh;
-                border-collapse: collapse;
-            }
-            #map {
-                display:flex;
-                width:25%;
-            }
+  <head>
+    <style>
+      body {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        margin: 0;
+      }
+      #top {
+        width: 98vw;
+        height: 5vh;
+        padding: 1vw;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      #top > div {
+        display: flex;
+      }
+      #status {
+        position: relative;
+        display: flex;
+        width: 25%;
+      }
+      #status img {
+        border-radius: 50%;
+        width: 10vh;
+        border-collapse: collapse;
+      }
+      #map {
+        display: flex;
+        width: 25%;
+      }
 
-            .bar {
-                position: absolute;
-                top: 0;
-                left: 0;
-                border-radius: 4px;
-                
-                height: 1vw;
-                z-index: -1;
+      .bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-radius: 4px;
 
-                background: rgba(0,0,0,0.7);
-                border: 1px solid rgba(0,0,0,0.7);
-            }
-            .bar div {
-                height: 1vw;
-                border-right:1px solid black;
-                transition:all 0.3s;
-            }
+        height: 1vw;
+        z-index: -1;
 
-            #healthbar {
-                width: 18vw;
-                left: 8vh;
-                top: 1vh;
-            }
-            #healthbar div {
-                background: linear-gradient(180deg, rgba(191,51,0,1) 0%, rgba(215,18,18,1) 8%, rgba(171,1,1,1) 44%);
-            }
+        background: rgba(0, 0, 0, 0.7);
+        border: 1px solid rgba(0, 0, 0, 0.7);
+      }
+      .bar div {
+        height: 1vw;
+        border-right: 1px solid black;
+        transition: all 0.3s;
+      }
 
-            #shieldbar {
-                width: 17vw;
+      #healthbar {
+        width: 18vw;
+        left: 8vh;
+        top: 1vh;
+      }
+      #healthbar div {
+        background: linear-gradient(
+          180deg,
+          rgba(191, 51, 0, 1) 0%,
+          rgba(215, 18, 18, 1) 8%,
+          rgba(171, 1, 1, 1) 44%
+        );
+      }
 
-                left: 9.5vh;
-                top: 2vw;
-            }
-            #shieldbar div {
-                background: linear-gradient(180deg, rgba(0,139,191,1) 0%, rgba(68,197,231,1) 8%, rgba(1,110,171,1) 44%);
-            }
+      #shieldbar {
+        width: 17vw;
 
-            #shieldbar2 {
-                width: 17.5vw;
-                left: 9vh;
-                top: 3.5vw;
-            }
-            #shieldbar2 div {
-                background: linear-gradient(180deg, rgba(0,139,191,1) 0%, rgba(68,197,231,1) 8%, rgba(1,110,171,1) 44%);
-            }
+        left: 9.5vh;
+        top: 2vw;
+      }
+      #shieldbar div {
+        background: linear-gradient(
+          180deg,
+          rgba(0, 139, 191, 1) 0%,
+          rgba(68, 197, 231, 1) 8%,
+          rgba(1, 110, 171, 1) 44%
+        );
+      }
 
-            #equipment {
+      #shieldbar2 {
+        width: 17.5vw;
+        left: 9vh;
+        top: 3.5vw;
+      }
+      #shieldbar2 div {
+        background: linear-gradient(
+          180deg,
+          rgba(0, 139, 191, 1) 0%,
+          rgba(68, 197, 231, 1) 8%,
+          rgba(1, 110, 171, 1) 44%
+        );
+      }
 
-            }
-            #equipment img {
-                border-radius: 4px;
-                width:10vh;
-                margin:0 0.5vh;
-            }
-            #equipment img.selected {
-                border-radius: 4px;
-                border:2px solid rgba(0,0,0,0.7)
-            }
+      #equipment {
+      }
+      #equipment img {
+        border-radius: 4px;
+        width: 10vh;
+        margin: 0 0.5vh;
+      }
+      #equipment img.selected {
+        border-radius: 4px;
+        border: 2px solid rgba(0, 0, 0, 0.7);
+      }
 
-            #dialogue {
-                font-family: sans-serif;
-                position: fixed;
-                display:flex;
-                align-items: flex-start;
-                bottom:0;
-                left: 25vw;
-                width:50vw;
-                height:20vh;
-                background-color:rgba(0,0,0,0.2);
-                border-top-left-radius:4px;
-                border-top-right-radius:4px;
+      #dialogue {
+        font-family: sans-serif;
+        position: fixed;
+        display: flex;
+        align-items: flex-start;
+        bottom: 0;
+        left: 25vw;
+        width: 50vw;
+        height: 20vh;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
 
-                transition:all 0.3s;
-            }
-            #dialogue.hidden {
-                bottom:-20vh;
-                opacity:0;
-            }
-            #dialogue img {
-                width: 25%;
-                margin: 1vw;
-                border-radius:4px;
-            }
-            #dialogue span {
-                margin: 1vw;
-            }
+        transition: all 0.3s;
+      }
+      #dialogue.hidden {
+        bottom: -20vh;
+        opacity: 0;
+      }
+      #dialogue img {
+        width: 25%;
+        margin: 1vw;
+        border-radius: 4px;
+      }
+      #dialogue span {
+        margin: 1vw;
+      }
 
-            #menu {
-                position:fixed;
-                display:flex;
-                justify-content: center;
-                align-items: center;
-                top:0;
-                left:0;
-                width:100vw;
-                height:100vh;
-                background: rgba(0,0,0,0.8);
-                transition: opacity 0.3s;
-            }
-            #menu.hidden {
-                opacity: 0;
-            }
-            #menu > div {
-                display: flex;
-                width:25vw;
-                background:aquamarine;
-                border:1px solid aliceblue;
-            }
-        </style>
-        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
-    </head>
-    <body>
-        <div id="game">
-        <div id="top">
-            <div id="status">
-                <img src='https://placekitten.com/100/100'>
-                <div id="healthbar" class="bar">
-                    <div v-bind:style="{ 'width': gdata.health + '%' }"></div>
-                </div>
-                <div id="shieldbar" class="bar">
-                    <div v-bind:style="{ 'width': gdata.shield1 + '%' }"></div>
-                </div>
-                <div id="shieldbar2" class="bar">
-                    <div v-bind:style="{ 'width': gdata.shield2 + '%' }"></div>
-                </div>
-            </div>
-            <div id="equipment">
-                <img src='https://placekitten.com/100/100'>
-                <img src='https://placekitten.com/100/100' class="selected">
-                <img src='https://placekitten.com/100/100'>
-            </div>
-            <div id="map">
-            </div>
+      #menu {
+        position: fixed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        transition: opacity 0.3s;
+      }
+      #menu.hidden {
+        opacity: 0;
+      }
+      #menu > div {
+        display: flex;
+        width: 25vw;
+        background: aquamarine;
+        border: 1px solid aliceblue;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="game">
+      <div id="top" v-if="gdata && gdata.player">
+        <div id="status">
+          <img src="https://placekitten.com/100/100" />
+          <div id="healthbar" class="bar">
+            <div v-bind:style="{ 'width': gdata.player.X + '%' }"></div>
+          </div>
+          <div id="shieldbar" class="bar">
+            <div v-bind:style="{ 'width': gdata.player.Y + '%' }"></div>
+          </div>
+          <div id="shieldbar2" class="bar">
+            <div v-bind:style="{ 'width': 0 + '%' }"></div>
+          </div>
         </div>
-
-        <div id="dialogue" v-bind:class="{ 'hidden': !hasDialogue }">
-            <template v-if="hasDialogue">
-                <img src='https://placekitten.com/64/64'>
-                <span>
-                    <strong v-text="currentDialogueName"></strong><br>
-                    <span v-text="currentDialogueText"></span>
-                    <span v-if="canAdvanceDialogue">😀</span>
-                </span>
-            </template>
+        <div id="equipment">
+          <img src="https://placekitten.com/100/100" />
+          <img src="https://placekitten.com/100/100" class="selected" />
+          <img src="https://placekitten.com/100/100" />
         </div>
+        <div id="map">{{ gdata.player.X }}</div>
+      </div>
 
-        <div id="menu" v-bind:class="{ 'hidden': !gdata.showMenu }">
-            <div>
-                <h1>Menu</h1>
-            </div>
-        </div>
-        </div>
+      <div id="dialogue" v-bind:class="{ 'hidden': !hasDialogue }">
+        <template v-if="hasDialogue">
+          <img src="https://placekitten.com/64/64" />
+          <span>
+            <strong v-text="currentDialogueName"></strong><br />
+            <span v-text="currentDialogueText"></span>
+            <span v-if="canAdvanceDialogue">😀</span>
+          </span>
+        </template>
+      </div>
 
-        <script type="text/javascript">
-            var manager = new Vue({
-                el: '#game',
-                data: {
-                    gdata: {},
-                    dialogue: null,
-                    currentDialogueN: 0,
-                    dialogueEndTime: new Date(),
-                    canAdvanceDialogue: true
-                },
-                computed: {
-                    hasDialogue() {
-                        return this.dialogue != null
-                    },
-                    currentDialogue() {
-                        return this.dialogue[this.currentDialogueN]
-                    },
-                    currentDialogueText() {
-                        return this.dialogue[this.currentDialogueN].text
-                    },
-                    currentDialogueName() {
-                        return this.dialogue[this.currentDialogueN].name
-                    },
-                },
-                methods: {
-                    beginDialogue(data, staySeconds) {
-                        this.dialogue = data
-                        this.currentDialogueN = 0
-                        this.canAdvanceDialogue = false
-                        if (data[0].passive) {
-                            setTimeout(() => { this.canAdvanceDialogue =  true; this.advanceDialogue() }, data[0].holdTime)
-                        } else {
-                            setTimeout(() => this.canAdvanceDialogue = true, 1000)
-                        }
-                    },
-                    advanceDialogue() {
-                        if (!this.dialogue) {
-                            return
-                        }
-                        if (this.canAdvanceDialogue) {
-                            if (this.currentDialogueN == this.dialogue.length - 1) {
-                                this.dialogue = null
-                                this.currentDialogueN = 0
-                            } else {
-                                this.currentDialogueN += 1
-                                this.canAdvanceDialogue = false
-                                if (this.currentDialogue.passive) {
-                                    setTimeout(() => { this.canAdvanceDialogue =  true; this.advanceDialogue() }, this.currentDialogue.holdTime)
-                                } else {
-                                    setTimeout(() => this.canAdvanceDialogue = true, 1000)
-                                }
-                            }
-                        }
-                    }
+      <div id="menu" v-bind:class="{ 'hidden': !gdata.isPaused }">
+        <div>
+          <h1>Menu</h1>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      var manager = new Vue({
+        el: "#game",
+        data: {
+          gdata: {},
+          dialogue: null,
+          currentDialogueN: 0,
+          dialogueEndTime: new Date(),
+          canAdvanceDialogue: true,
+        },
+        computed: {
+          hasDialogue() {
+            return this.dialogue != null;
+          },
+          currentDialogue() {
+            return this.dialogue[this.currentDialogueN];
+          },
+          currentDialogueText() {
+            return this.dialogue[this.currentDialogueN].text;
+          },
+          currentDialogueName() {
+            return this.dialogue[this.currentDialogueN].name;
+          },
+        },
+        methods: {
+          beginDialogue(data, staySeconds) {
+            this.dialogue = data;
+            this.currentDialogueN = 0;
+            this.canAdvanceDialogue = false;
+            if (data[0].passive) {
+              setTimeout(() => {
+                this.canAdvanceDialogue = true;
+                this.advanceDialogue();
+              }, data[0].holdTime);
+            } else {
+              setTimeout(() => (this.canAdvanceDialogue = true), 1000);
+            }
+          },
+          advanceDialogue() {
+            if (!this.dialogue) {
+              return;
+            }
+            if (this.canAdvanceDialogue) {
+              if (this.currentDialogueN == this.dialogue.length - 1) {
+                this.dialogue = null;
+                this.currentDialogueN = 0;
+              } else {
+                this.currentDialogueN += 1;
+                this.canAdvanceDialogue = false;
+                if (this.currentDialogue.passive) {
+                  setTimeout(() => {
+                    this.canAdvanceDialogue = true;
+                    this.advanceDialogue();
+                  }, this.currentDialogue.holdTime);
+                } else {
+                  setTimeout(() => (this.canAdvanceDialogue = true), 1000);
                 }
-            })
-            
-            let gdata = {
-                health: 100,
-                shield1: 83,
-                shield2: 0,
-                showMenu: false
+              }
             }
-            
-            function updateData(data) {
-                manager.$set(manager,'gdata',data)
-            }
+          },
+        },
+      });
 
-            function beginDialogue(data) {
-                manager.beginDialogue(data)
-            }
+      let gdata = {
+        player: {
+          X: 0,
+          Y: 0,
+        },
+        isPaused: false,
+        showMenu: false,
+      };
 
-            updateData(gdata)
-            beginDialogue([
-                {
-                    name: 'Cat',
-                    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula, lacus vel mollis convallis, sapien justo volutpat sapien, at lobortis sapien erat et metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi faucibus enim ligula, a posuere sapien fringilla quis.',
-                    passive: true,
-                    holdTime: 3000
-                },
-                {
-                    name: 'Mouse',
-                    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula, lacus vel mollis convallis, sapien justo volutpat sapien, at lobortis sapien erat et metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi faucibus enim ligula, a posuere sapien fringilla quis.',
-                    passive: true,
-                    holdTime: 2000
-                },
-                {
-                    name: 'Cat',
-                    text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula, lacus vel mollis convallis, sapien justo volutpat sapien, at lobortis sapien erat et metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi faucibus enim ligula, a posuere sapien fringilla quis.',
-                    passive: true,
-                    holdTime: 1000
-                },
-            ])
-        </script>
-    </body>
+      function beginDialogue(data) {
+        manager.beginDialogue(data);
+      }
+
+      function receiveData(data) {
+        manager.$set(manager, "gdata", data);
+      }
+
+      receiveData(gdata);
+
+      beginDialogue([
+        {
+          name: "Cat",
+          text:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula, lacus vel mollis convallis, sapien justo volutpat sapien, at lobortis sapien erat et metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi faucibus enim ligula, a posuere sapien fringilla quis.",
+          passive: true,
+          holdTime: 3000,
+        },
+        {
+          name: "Mouse",
+          text:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula, lacus vel mollis convallis, sapien justo volutpat sapien, at lobortis sapien erat et metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi faucibus enim ligula, a posuere sapien fringilla quis.",
+          passive: true,
+          holdTime: 2000,
+        },
+        {
+          name: "Cat",
+          text:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vehicula, lacus vel mollis convallis, sapien justo volutpat sapien, at lobortis sapien erat et metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi faucibus enim ligula, a posuere sapien fringilla quis.",
+          passive: true,
+          holdTime: 1000,
+        },
+      ]);
+    </script>
+  </body>
 </html>

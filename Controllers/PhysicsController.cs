@@ -23,6 +23,7 @@ public class CollisionResult
 public static class PhysicsController
 {
     public static World World = new World();
+    public static float WorldScale = 10f;
 
     public static CollisionResult RayCastFirst(Vector2 point_0, Vector2 point_1, IGameEntity ignore)
     {
@@ -70,7 +71,7 @@ public static class PhysicsController
         //     return  0: terminate the ray cast
         //     return fraction: clip the ray to this point
         //     return 1:        don't clip the ray and continue
-        World.RayCast(get_first_callback, point_0, point_1);
+        World.RayCast(get_first_callback, ConvertUnits.ToSimUnits(point_0), ConvertUnits.ToSimUnits(point_1));
 
         return result;
     }

@@ -1,12 +1,14 @@
 using ImpromptuNinjas.UltralightSharp.Safe;
 using ImpromptuNinjas.UltralightSharp.Enums;
+using ImpromptuNinjas.UltralightSharp;
 using MonoGame.Extended;
 using System;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using Newtonsoft.Json;
+using System.Runtime.InteropServices;
 public static class WebUIRenderer
     {
         public static ImpromptuNinjas.UltralightSharp.Safe.View WebView;
@@ -34,7 +36,7 @@ public static class WebUIRenderer
 
                     cfg.SetUseGpuRenderer(false);
                     cfg.SetEnableImages(true);
-                    cfg.SetEnableJavaScript(false);
+                    cfg.SetEnableJavaScript(true);
 
                     ImpromptuNinjas.UltralightSharp.Safe.AppCore.EnablePlatformFontLoader();
 
@@ -43,30 +45,114 @@ public static class WebUIRenderer
 
                     Renderer = new ImpromptuNinjas.UltralightSharp.Safe.Renderer(cfg);
                     Session = new ImpromptuNinjas.UltralightSharp.Safe.Session(Renderer, false, "game");
-                    WebView = new ImpromptuNinjas.UltralightSharp.Safe.View(Renderer, (uint)size.Width, (uint)size.Height,true, Session);                    
+                    WebView = new ImpromptuNinjas.UltralightSharp.Safe.View(Renderer, (uint)size.Width, (uint)size.Height, true, Session);                    
                 }
             } else {
                 WebView.Resize((uint)size.Width, (uint)size.Height);
             }
-            WebView.LoadHtml(@"
-                <div style='width:100vw;height:4em;background-color:rgba(128,128,128,64);border-radius:4px;'>lel top</div>
 
-                <div style='position:fixed;bottom:0;left:0;width:100vw;height:4em;background-color:rgba(128,128,128,64);border-radius:4px;'>lel bottom</div>
+            var ctx = WebView.LockJsContext();
+            
+            
+            unsafe {
+                ImpromptuNinjas.UltralightSharp.JsValue* func1(ImpromptuNinjas.UltralightSharp.JsContext* ctx,
+                    ImpromptuNinjas.UltralightSharp.JsValue* function,
+                    ImpromptuNinjas.UltralightSharp.JsValue* thisObject,
+                    UIntPtr argumentCount,
+                    ImpromptuNinjas.UltralightSharp.JsValue** arguments,
+                    ImpromptuNinjas.UltralightSharp.JsValue** exception
+                )
+                {
+                    
+                    Console.WriteLine("js called");
+
+                    var localCtx = new JsLocalContext(ctx);
+                    var argCount = (int)argumentCount;
+                    var args = new JsValueLike?[argCount];
+                    for (var i = 0; i < argCount; ++i)
+                    {
+                        var arg = JsValueLike.Create(arguments[i], localCtx);
+                        var t = arg.GetJsType();
+                        if (t == JsType.String)
+                        {
+                            JsValueLike exc;
+                            var s = arg.ToStringCopy(out exc);
+                            string str = s;
+                            Console.WriteLine(str);
+                        }
+
+                    }
+
+                    //ImpromptuNinjas.UltralightSharp.Safe.JsString retval = "";
+                    return null;// (ImpromptuNinjas.UltralightSharp.JsValue*)retval.Unsafe; crash?
+                }
                 
-            ");
-            //WebView.LoadUrl(Source);
+
+                var p = new FnPtr<ImpromptuNinjas.UltralightSharp.ObjectCallAsFunctionCallback>(func1);
+
+                ImpromptuNinjas.UltralightSharp.Safe.JsString funcName = "test";
+
+                
+                var funcRef = ImpromptuNinjas.UltralightSharp.JavaScriptCore.JsObjectMakeFunctionWithCallback(ctx.Unsafe, funcName.Unsafe, p);
+                var oref = ctx.GetGlobalObject();
+
+                ImpromptuNinjas.UltralightSharp.JavaScriptCore.JsObjectSetProperty(ctx.Unsafe, oref.Unsafe, funcName.Unsafe, funcRef, JsPropertyAttribute.ReadOnly, null);
+            }
+            
+            WebView.UnlockJsContext();
+
+            var testhtml = File.ReadAllText("test/testui.html");
+
+            WebView.LoadHtml(testhtml);
+        }
+
+        
+        public static void SetData(object data)
+        {
+            var jsonString = JsonConvert.SerializeObject(data);
+            //var js = WebView.LockJsContext();            
+            WebView.EvaluateScript($"receiveData({jsonString})");
+            //WebView.UnlockJsContext();
         }
 
         public static void Update()
         {
-            Console.WriteLine(WebView.IsLoading());
+            var mousePos = Mouse.GetState().Position;
+
+            SetMousePos(mousePos);
+            if (InputController.LeftClickPressed)
+            {
+                InjectMouseDown(mousePos);
+            } 
+            if (InputController.LeftClickReleased) {
+                InjectMouseUp(mousePos);
+            }
+
             Renderer.Update();
-            Renderer.Render();
+        }
+
+        public static void InjectMouseDown(Point pos)
+        {
+            WebView.FireMouseEvent(new ImpromptuNinjas.UltralightSharp.Safe.MouseEvent(MouseEventType.MouseDown, (int)pos.X, (int)pos.Y, MouseButton.Left));
+        }
+        public static void InjectMouseUp(Point pos)
+        {
+            WebView.FireMouseEvent(new ImpromptuNinjas.UltralightSharp.Safe.MouseEvent(MouseEventType.MouseUp, (int)pos.X, (int)pos.Y, MouseButton.Left));
+        }
+
+        public static void InjectKeyboard()
+        {
+            //WebView.FireKeyEvent(new KeyEvent(KeyEventType.))
+        }
+
+        public static void SetMousePos(Point pos)
+        {
+            WebView.FireMouseEvent(new ImpromptuNinjas.UltralightSharp.Safe.MouseEvent(MouseEventType.MouseMoved, (int)pos.X, (int)pos.Y, MouseButton.None));
         }
 
         public static unsafe Texture2D GetTexture(GraphicsDevice graphicsDevice)
         {
-            
+            Renderer.Render();
             var surface = WebView.GetSurface();
             var bitmap = surface.GetBitmap();
             

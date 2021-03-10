@@ -20,6 +20,9 @@ namespace metroidvania
         private DebugView DebugView = null;
         private FramesPerSecondCounter FPSCounter;
 
+        public bool isPaused = false;
+        private float GameSpeed = 1;
+
 
         public GameMain()
         {            
@@ -27,11 +30,11 @@ namespace metroidvania
             {
                 PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8
             };
-            _graphics.PreferredBackBufferWidth = 1280;
-            _graphics.PreferredBackBufferHeight = 720;
+            _graphics.PreferredBackBufferWidth = 1920;
+            _graphics.PreferredBackBufferHeight = 1080;
             _graphics.ApplyChanges();
-            _graphics.PreferredBackBufferWidth = 1280;
-            _graphics.PreferredBackBufferHeight = 720;
+            _graphics.PreferredBackBufferWidth = 1920;
+            _graphics.PreferredBackBufferHeight = 1080;
             _graphics.ApplyChanges();
 
             Content.RootDirectory = "Content";
@@ -46,14 +49,14 @@ namespace metroidvania
         {
             CameraController.Setup(GraphicsDevice);
             InputController.Setup(CameraController.Camera);
-            WebUIRenderer.Setup("https://google.com", new Size2(1280, 720));
+            WebUIRenderer.Setup("https://news.bbc.co.uk", new Size2(1920, 1080));
 
             FPSCounter = new FramesPerSecondCounter();
 
             world = new WorldEntity(Content, GraphicsDevice, "untitled");
 
             LocalPlayer = new Player();
-            LocalPlayer.Position = new Vector2(800, 200);
+            LocalPlayer.Position = new Vector2(200, 200);
             EntityManager.AllEntities.Add(LocalPlayer);
 
             DebugView = new DebugView(PhysicsController.World);
@@ -74,23 +77,40 @@ namespace metroidvania
         {
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            if (InputController.PausePressed) {
+                isPaused = !isPaused;
+            }
+            if (InputController.PauseReleased) {} // for now, bad implementation needs this call
+
+            if (isPaused) {
+                GameSpeed = MathHelper.Lerp(GameSpeed, 0, delta * 4);
+            } else {
+                GameSpeed = MathHelper.Lerp(GameSpeed, 1, delta * 4);
+            }
             
+
             world.UpdateWorld(gameTime);
 
             foreach (var ent in EntityManager.AllEntities) {
-                ent.Update(delta);
+                ent.Update(delta * GameSpeed);
             }
 
             var kb = Keyboard.GetState();
 
-            CameraController.Update(delta, LocalPlayer.Position, LocalPlayer.Body.LinearVelocity.NormalizedCopy());
+            CameraController.Update(delta * GameSpeed, LocalPlayer.Position, LocalPlayer.Body.LinearVelocity.NormalizedCopy());
 
-            PhysicsController.World.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
+            PhysicsController.World.Step((float)gameTime.ElapsedGameTime.TotalSeconds * GameSpeed);
 
             FPSCounter.Update(gameTime);
 
+            WebUIRenderer.SetData(new GameData() {
+                isMainMenu = false,
+                isPaused = isPaused,
+                player = new {
+                    LocalPlayer.Position.X,
+                    LocalPlayer.Position.Y
+                }
+            });
             WebUIRenderer.Update();
 
             base.Update(gameTime);
@@ -137,6 +157,7 @@ namespace metroidvania
 
             FPSCounter.Draw(gameTime);
 
+            
             var _tex = WebUIRenderer.GetTexture(GraphicsDevice);
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             _spriteBatch.Draw(_tex, Vector2.Zero, Color.White);
